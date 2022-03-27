@@ -3,19 +3,68 @@ import styled from "styled-components";
 import AddIcon from '@mui/icons-material/Add';
 import {Avatar} from '@mui/material';
 
+import {signInWithPopup} from "@firebase/auth";
+import {auth, provider} from "../firebase";
+import {useDispatch, useSelector} from "react-redux";
+import {selectName, selectPhoto, setLogIn} from "../features/User/userSlice";
+
+import {selectStarter, setStarter} from '../features/Boolean/boolSlice';
+
+
 function Header() {
+    const dispatch = useDispatch();
+    const name = useSelector(selectName);
+    const photo = useSelector(selectPhoto);
+    const starter = useSelector(selectStarter);
+
+    const signIn = () => {
+        signInWithPopup(auth, provider).then((result) => {
+            const user = result.user;
+
+            dispatch(
+                setLogIn({
+                    name: user.displayName,
+                    email: user.email,
+                    photo: user.photoURL
+                })
+            );
+        })
+    }
+
+    const Make = () => {
+        if (starter) {
+            dispatch(setStarter({starter: false}));
+        } else {
+            dispatch(setStarter({starter: true}));
+        }
+    }
+
+
+
+
     return <Container>
         <Wrapper>
             <Logo>
                 <span>Social</span>
             </Logo>
             <RightContainer>
-                <PlusContainer>
-                    <AddIcon />
-                </PlusContainer>
-                <User>
-                    <Avatar />
-                </User>
+                {
+                    name ? (
+                        <>
+                            <PlusContainer>
+                                <AddIcon onClick={Make} />
+                            </PlusContainer>
+
+
+                            <User>
+                                <Avatar src={photo} />
+                            </User>
+                        </>
+                    ) : (
+                        <Button onClick={signIn} >Sign In</Button>
+                    )
+                }
+
             </RightContainer>
         </Wrapper>
     </Container>
@@ -55,7 +104,13 @@ const RightContainer = styled.div`
 `;
 
 const User = styled.div`
-    display: flex;
+    margin-left: 10px;
+    cursor: pointer;
+    transition: all 150ms ease-out,
+    :hover {
+        opacity: 0.75;
+    }
+
 `;
 
 const PlusContainer = styled.div`
@@ -78,3 +133,18 @@ const PlusContainer = styled.div`
         }
     }
 `;
+
+const Button = styled.div`
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    font-weight: bold;
+    color:white;
+    background-color: rgba(59,130,246,1);
+    cursor: pointer;
+`;
+
+
+
+
+

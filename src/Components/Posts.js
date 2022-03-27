@@ -1,16 +1,34 @@
+import { Avatar } from '@mui/material'
 import React, {useState} from 'react';
 import styled from 'styled-components';
-
-import { Avatar } from '@mui/material'
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DeleteIcon from "@mui/icons-material/Delete";
 
+import {useSelector} from "react-redux";
+import {selectEmail, selectName} from "../features/User/userSlice";
+import {deleteDoc, doc} from "@firebase/firestore";
+import db, {storage} from '../firebase';
+import {deleteObject, ref} from "@firebase/storage";
 
 
-function Posts() {
+
+function Posts({title, photo, caption, email, img, id}) {
     const [cards, setCards] = useState(false);
+    const emails = useSelector(selectEmail);
+    const name = useSelector(selectName);
+
     const Delete = () => {
         setCards(false);
+        if (title ===name || email === emails) {
+            deleteDoc(doc(db, "post", id));
+
+            const desertRef = ref(storage, `post/${id}/image`);
+            deleteObject(desertRef).then(() => {
+                alert('this post has successfully been deleted');
+            }).catch((error) => {
+                console.error(error.message)
+            })
+        }
     }
 
 
@@ -21,8 +39,8 @@ function Posts() {
     <Container>
         <Header>
             <List>
-                <Avatar />
-                <span>Timo</span>
+                <Avatar src={photo} />
+                <span>{title}</span>
             </List>
             <RightContainer>
                 <MoreHorizIcon 
@@ -40,11 +58,11 @@ function Posts() {
             </RightContainer>
         </Header>
         <Post>
-            <img src="https://images.unsplash.com/photo-1647823082695-58562e2d1917?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80" alt="image" />
+            <img src={img} alt="gambar foto" />
 
         </Post>
         <Caption >
-            <span>Tino</span> : <p>Working on a social media website.</p>
+            <span>{title}</span> : <p>{caption}</p>
         </Caption>
     </Container>
   )

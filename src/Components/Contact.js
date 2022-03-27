@@ -1,18 +1,41 @@
 import React from 'react';
 import styled from 'styled-components';
 import {Avatar} from '@mui/material';
+import {selectName, selectPhoto, setLogOut} from '../features/User/userSlice';
+import {useSelector} from 'react-redux';
+import { signOut } from 'firebase/auth';
 
+import {auth} from '../firebase';
+import { useDispatch } from 'react-redux';
 
 function Contact() {
-  return (
-      <Container>
-          <Header>
-              <Avatar />
-              <span>Hello Tino</span>
-              <p>Log Out</p>
-          </Header>
-      </Container>
-  )
+    const name = useSelector(selectName);
+    const photo = useSelector(selectPhoto);
+    // const shortName = name.split(" ");
+    const shortName = name?.split(" ");
+    const dispatch = useDispatch();
+
+    const LogOut = () => {
+        signOut(auth, (result) => {
+            dispatch(
+                setLogOut({
+                    name: null,
+                    photo: null,
+                    email: null
+                })
+            )
+        });
+    }
+
+    return (
+        <Container>
+            <Header>
+                <Avatar  src={photo} />
+                <span>Hello {name ? shortName[0] : "Guest"}</span>
+                <p onClick={LogOut} >Log Out</p>
+            </Header>
+        </Container>
+    )
 }
 
 export default Contact;
@@ -51,6 +74,13 @@ const Header = styled.div`
         }
     }
 
+    svg {
+        cursor: pointer;
+        transition: all 150ms ease-out;
+        :hover {
+            opacity: 0.75;
+        }
+    }
 
 
 `;
