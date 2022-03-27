@@ -1,15 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
 import Post from './Post'
-
+import Contact from './Contact';
 
 function Home() {
     return (
         <Container>
             <Sections>
+                {/* Post */}
                 <Post />
             </Sections>
-            <Section>b</Section>
+            <Section>
+                {/* User Stuff */}
+                <div>
+                    <Contact />
+                </div>
+            </Section>
         </Container>
     )
 }
